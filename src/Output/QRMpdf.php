@@ -29,15 +29,16 @@ class QRMpdf extends QROutputAbstract{
 	public const MIME_TYPE = 'application/pdf';
 
 	protected ?Mpdf   $mpdf = null;
+	protected float   $ratio;
 	protected ?array $prevColor = null;
-    protected bool $border = true;
+	protected bool $border = true;
 
 	/**
 	 * QRFpdf constructor.
 	 *
 	 * @throws \chillerlan\QRCode\Output\QRCodeOutputException
 	 */
-	public function __construct(SettingsContainerInterface $options, QRMatrix $matrix, ?Mpdf $mpdf = null){
+	public function __construct(SettingsContainerInterface $options, QRMatrix $matrix, ?Mpdf $mpdf = null, private float $iX = 0, private float $iY = 0, private ?float $size = 200){
 
 		if(!class_exists(Mpdf::class)){
 			// @codeCoverageIgnoreStart
@@ -48,9 +49,9 @@ class QRMpdf extends QROutputAbstract{
 			// @codeCoverageIgnoreEnd
 		}
 
-        if($mpdf !== null) {
-            $this->mpdf = $mpdf;
-        }
+		if($mpdf !== null) {
+			$this->mpdf = $mpdf;
+		}
 
 		parent::__construct($options, $matrix);
 	}
@@ -119,33 +120,34 @@ class QRMpdf extends QROutputAbstract{
 		return new Mpdf();
 	}
 
-    public function disableBorder(): void {
-        $this->border = false;
-    }
+	public function disableBorder(): void {
+		$this->border = false;
+	}
 
 	/**
 	 * @inheritDoc
 	 *
 	 * @return string|\FPDF
 	 */
-	public function dump(string $file = null){
+	public function dump(string $file = null):mixed {
 		if($this->mpdf === null) {
-            $this->mpdf = $this->initMPDF();
-            $this->mpdf->AddPage();
-        }
+			$this->mpdf = $this->initMPDF();
+			$this->mpdf->AddPage();
+		}
 
+		[$width, $height] = $this->getOutputDimensions();
+
+		$this->ratio = $this->size / $width;
 
 		if($this::moduleValueIsValid($this->options->bgColor)){
 			$bgColor          = $this->prepareModuleValue($this->options->bgColor);
-			[$width, $height] = $this->getOutputDimensions();
+
 
 			/** @phan-suppress-next-line PhanParamTooFewUnpack */
 			$this->mpdf->SetFillColor(...$bgColor);
-            if($this->border) {
-                $this->mpdf->Rect(-4, -4, $width + 8, $height + 8, 'FD');
-            }else{
-                $this->mpdf->Rect(0, 0, $width, $height, 'F');
-            }
+			if($this->border) {
+				$this->mpdf->Rect($this->iX + -4, $this->iY + -4, ($width + 8) * $this->ratio, ($height + 8) * $this->ratio, 'FD');
+			}
 		}
 
 		$this->prevColor = null;
@@ -188,7 +190,7 @@ class QRMpdf extends QROutputAbstract{
 			$this->prevColor = $color;
 		}
 
-		$this->mpdf->Rect(($x * $this->scale), ($y * $this->scale), $this->scale, $this->scale, 'F');
+		$this->mpdf->Rect($this->iX + ($x * $this->scale) * $this->ratio, $this->iY + ($y * $this->scale) * $this->ratio, $this->scale * $this->ratio, $this->scale * $this->ratio, 'F');
 	}
 
 }
