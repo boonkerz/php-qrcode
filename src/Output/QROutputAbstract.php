@@ -30,7 +30,7 @@ abstract class QROutputAbstract implements QROutputInterface{
 	/**
 	 * the side length of the QR image (modules * scale)
 	 */
-	protected int $length;
+	protected float $length;
 
 	/**
 	 * an (optional) array of color values for the several QR matrix parts
@@ -48,7 +48,7 @@ abstract class QROutputAbstract implements QROutputInterface{
 	protected SettingsContainerInterface $options;
 
 	/** @see \chillerlan\QRCode\QROptions::$scale */
-	protected int $scale;
+	protected float $scale;
 	/** @see \chillerlan\QRCode\QROptions::$connectPaths */
 	protected bool $connectPaths;
 	/** @see \chillerlan\QRCode\QROptions::$excludeFromConnect */

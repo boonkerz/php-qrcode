@@ -311,7 +311,7 @@ trait QROptionsTrait{
 	/**
 	 * Pixel size of a QR code module
 	 */
-	protected int $scale = 5;
+	protected float $scale = 5;
 
 	/**
 	 * Toggle transparency
