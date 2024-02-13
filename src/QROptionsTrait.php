@@ -416,6 +416,8 @@ trait QROptionsTrait{
 	 */
 	protected string $svgPreserveAspectRatio = 'xMidYMid';
 
+	protected string $svgWidth = "100%";
+    protected string $svgHeight = "100%";
 	/**
 	 * Whether to use the SVG `fill` attributes
 	 *
